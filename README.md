@@ -25,7 +25,7 @@ go get github.com/streadway/amqp
     - 启动上传应用程序:
 ```bash
 # cd $GOPATH/<你的工程目录>
-> cd $GOPATH/filestore-server
+> cd $GOPATH/file-storage-system
 > go run main.go
 ```
 
@@ -35,7 +35,7 @@ go get github.com/streadway/amqp
     
       ```bash
       # cd $GOPATH/<你的工程目录>
-      > cd $GOPATH/filestore-server
+      > cd $GOPATH/file-storage-system
       > go run service/upload/main.go
       ```
     
@@ -43,7 +43,7 @@ go get github.com/streadway/amqp
     
       ```bash
       # cd $GOPATH/<你的工程目录>
-      > cd $GOPATH/filestore-server
+      > cd $GOPATH/file-storage-system
       > go run service/transfer/main.go
       ```
 ### 进度情况

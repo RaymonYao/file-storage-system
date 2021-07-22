@@ -2,23 +2,24 @@ package handler
 
 import (
 	"encoding/json"
-	"filestore-server/mq"
+	"file-storage-system/mq"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	cmn "filestore-server/common"
-	cfg "filestore-server/config"
-	dblayer "filestore-server/db"
-	"filestore-server/meta"
-	"filestore-server/store/ceph"
-	"filestore-server/store/oss"
-	"filestore-server/util"
+	cmn "file-storage-system/common"
+	cfg "file-storage-system/config"
+	dblayer "file-storage-system/db"
+	"file-storage-system/meta"
+	"file-storage-system/store/ceph"
+	"file-storage-system/store/oss"
+	"file-storage-system/util"
 )
 
 // UploadHandler ： 处理文件上传
@@ -27,14 +28,14 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		// 返回上传html页面
 		data, err := ioutil.ReadFile("./static/view/index.html")
 		if err != nil {
-			io.WriteString(w, "internel server error")
+			_, _ = io.WriteString(w, "internel server error")
 			return
 		}
-		io.WriteString(w, string(data))
+		_, _ = io.WriteString(w, string(data))
 		// 另一种返回方式:
 		// 动态文件使用http.HandleFunc设置，静态文件使用到http.FileServer设置(见main.go)
 		// 所以直接redirect到http.FileServer所配置的url
-		// http.Redirect(w, r, "/static/view/index.html",  http.StatusFound)
+		//http.Redirect(w, r, "/static/view/index.html",  http.StatusFound)
 	} else if r.Method == "POST" {
 		// 接收文件流及存储到本地目录
 		file, head, err := r.FormFile("file")
@@ -42,7 +43,12 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("Failed to get data, err:%s\n", err.Error())
 			return
 		}
-		defer file.Close()
+		defer func(file multipart.File) {
+			_ = file.Close()
+			if err != nil {
+				fmt.Printf("Failed to close file, err:%s\n", err.Error())
+			}
+		}(file)
 
 		fileMeta := meta.FileMeta{
 			FileName: head.Filename,
@@ -55,7 +61,12 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("Failed to create file, err:%s\n", err.Error())
 			return
 		}
-		defer newFile.Close()
+		defer func(newFile *os.File) {
+			err := newFile.Close()
+			if err != nil {
+				fmt.Printf("Failed to close file, err:%s\n", err.Error())
+			}
+		}(newFile)
 
 		fileMeta.FileSize, err = io.Copy(newFile, file)
 		if err != nil {
@@ -63,11 +74,11 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		newFile.Seek(0, 0)
+		_, _ = newFile.Seek(0, 0)
 		fileMeta.FileSha1 = util.FileSha1(newFile)
 
 		// 游标重新回到文件头部
-		newFile.Seek(0, 0)
+		_, _ = newFile.Seek(0, 0)
 
 		if cfg.CurrentStoreType == cmn.StoreCeph {
 			// 文件写入Ceph存储
@@ -106,7 +117,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-
 		// meta.UpdateFileMeta(fileMeta)
 		_ = meta.UpdateFileMetaDB(fileMeta)
 

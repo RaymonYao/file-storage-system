@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	dblayer "filestore-server/db"
-	"filestore-server/util"
+	dblayer "file-storage-system/db"
+	"file-storage-system/util"
 )
 
 const (

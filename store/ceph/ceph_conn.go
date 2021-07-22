@@ -4,7 +4,7 @@ import (
 	"gopkg.in/amz.v1/aws"
 	"gopkg.in/amz.v1/s3"
 
-	cfg "filestore-server/config"
+	cfg "file-storage-system/config"
 )
 
 var cephConn *s3.S3

@@ -3,10 +3,10 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"filestore-server/config"
-	dblayer "filestore-server/db"
-	"filestore-server/mq"
-	"filestore-server/store/oss"
+	"file-storage-system/config"
+	dblayer "file-storage-system/db"
+	"file-storage-system/mq"
+	"file-storage-system/store/oss"
 	"log"
 	"os"
 )

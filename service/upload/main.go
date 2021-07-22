@@ -1,9 +1,8 @@
 package main
 
 import (
-	// "filestore-server/assets"
-	cfg "filestore-server/config"
-	"filestore-server/handler"
+	cfg "file-storage-system/config"
+	"file-storage-system/handler"
 	"fmt"
 	"net/http"
 )
