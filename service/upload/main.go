@@ -10,8 +10,9 @@ import (
 func main() {
 	// 静态资源处理
 	// http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(assets.AssetFS())))
+	//这里的意思是所有路由以static开头（/static/）的请求，先过滤掉static,并将修改过的请求定向到http.FileServer所返回的Handler中去
 	http.Handle("/static/",
-		http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+		http.StripPrefix("/static/", http.FileServer(http.Dir("../../static"))))
 
 	// 文件存取接口
 	http.HandleFunc("/file/upload", handler.HTTPInterceptor(handler.UploadHandler))
@@ -42,7 +43,7 @@ func main() {
 	http.HandleFunc("/user/signin", handler.SignInHandler)
 	http.HandleFunc("/user/info", handler.HTTPInterceptor(handler.UserInfoHandler))
 
-	fmt.Printf("上传服务启动中，开始监听监听[%s]...\n", cfg.UploadServiceHost)
+	fmt.Printf("上传服务启动中，开始监听[%s]...\n", cfg.UploadServiceHost)
 	// 启动服务并监听端口
 	err := http.ListenAndServe(cfg.UploadServiceHost, nil)
 	if err != nil {
